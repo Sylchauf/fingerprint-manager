@@ -1,5 +1,9 @@
-FROM sylchauf/node-fprint
+FROM rpi-node-fprint
 
 ADD src/ /home/fingerprint-manager
 
-CMD /home/fingerprint-manager/app.js
+WORKDIR /home/fingerprint-manager
+
+RUN npm install
+
+CMD node /home/fingerprint-manager/app.js
