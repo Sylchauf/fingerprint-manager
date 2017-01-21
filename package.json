@@ -1,0 +1,25 @@
+{
+  "name": "fingerprint-manager",
+  "version": "1.0.0",
+  "description": "manager for fingerprint devices",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.14.0",
+    "flat-file-db": "^1.0.0",
+    "socket.io": "^1.7.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sylchauf/fingerprint-manager.git"
+  },
+  "author": "Sylchauf",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sylchauf/fingerprint-manager/issues"
+  },
+  "homepage": "https://github.com/Sylchauf/fingerprint-manager#readme"
+}
