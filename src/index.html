@@ -144,7 +144,9 @@
             <div id="enrollForm" style="display:none;">
                 <label>Name : </label>
                 <input type="text" name="name" id="name" />
-                <button class="btn btn-default btn-xs" onClick="socket.emit('startEnroll', $('#name').val())">Enroll</button><br />
+                <label>Url Action : </label>
+                <input type="url" name="url" id="url" />
+                <button class="btn btn-default btn-xs" onClick="socket.emit('startEnroll', $('#name').val(), $('#url').val())">Enroll</button><br />
                 <div id="content"></div>
             </div>
 
@@ -156,6 +158,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Last Success</th>
+                            <th>Url Action</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -194,11 +197,10 @@
             socket.on('updateContent', function(data) {
                 if (data === 'stored') {
                     $('#content').html('<i style="font-size: 16px; color: green;" class="fa fa-check-circle-o" aria-hidden="true"></i>');
+                    window.location.reload();
                 } else {
                     $('#content').append(data);
-                    window.location.reload();
                 }
-
             });
 
             socket.on('getUsers', function(data) {
@@ -206,9 +208,9 @@
                 $('.logs').hide('hide');
                 $('.list').show('slow');
 
-                if (data.length > 0) {
+                if (data !== null && data.length > 0) {
                     data.forEach(function(item, index) {
-                        var ligne = '<tr><td>'+item.name+'</td><td>'+timeConverter(item.lastSuccess)+'</td><td><i style="cursor: pointer" onClick="if (confirm(\'Are you sure ?\')) { socket.emit(\'delete\', \''+index+'\'); }" class="fa fa-trash" aria-hidden="true"></i></td></tr>';
+                        var ligne = '<tr><td>'+item.name+'</td><td>'+timeConverter(item.lastSuccess)+'</td><td>'+item.urlAction+'</td><td><i style="cursor: pointer" onClick="if (confirm(\'Are you sure ?\')) { socket.emit(\'delete\', \''+index+'\'); }" class="fa fa-trash" aria-hidden="true"></i></td></tr>';
 
                         $('#list table tbody').append(ligne);
                     });

@@ -1,5 +1,6 @@
 var fprint = require("../node-fprint/index");
 var express = require('express');
+var request = require('request');
 var flatfile = require('flat-file-db');
 var fs = require('fs');
 
@@ -14,8 +15,12 @@ var identifyInProgress = false;
 var users = db.get('users');
 var logs = db.get('logs');
 
+console.log(users);
 if (users === undefined) {
+    console.log('Init users !');
     users = [];
+    db.put('users', users);
+    console.log(users);
 }
 if (logs === undefined) {
     logs = [];
@@ -60,6 +65,11 @@ if(ret) {
 
                             db.put('users', users);
                             db.put('logs', logs);
+
+                            //on appelle l'action
+                            if (users[index].urlAction != '') {
+                                request(users[index].urlAction);
+                            }
                         } else {
                             console.log("MATCH FAILED.");
                         }
@@ -83,11 +93,11 @@ if(ret) {
             }
         }
 
-        function enroll(name) {
+        function enroll(name, urlAction) {
             var stage = 1;
             var stages = fprint.getEnrollStages(deviceHandle);
             oneClient.emit('updateContent', "enroll your finger! You will need swipe your finger " + stages + " times.<br /><br />");
-            oneClient.emit('updateContent', "stage " + stage++ + "/" + stages);
+            oneClient.emit('updateContent', "stage " + stage++ + "/" + stages+'...');
 
             fprint.enrollStart(deviceHandle, function(state, message, fingerprint) {
                 oneClient.emit('updateContent', message + "<br />");
@@ -99,7 +109,12 @@ if(ret) {
                         myUser = {};
                         myUser.fingerprint = fingerprint;
                         myUser.name = name;
+                        myUser.urlAction = urlAction;
                         myUser.lastSuccess = null;
+
+                        console.log(users);
+
+                        users = db.get('users');
 
                         users[users.length] = myUser;
                         db.put('users', users);
@@ -135,19 +150,20 @@ app.get('/', function (req, res) {
 
              client.on('delete', function(index) {
                  users.splice(index, 1);
+                 db.put('users', users);
                  client.emit('getUsers', users);
              });
 
-             client.on('startEnroll', function(name) {
+             client.on('startEnroll', function(name, urlAction) {
                  if (identifyInProgress) {
                      fprint.identifyStop(deviceHandle, function () {
                          console.log('Stop identify. Start recording');
                          identifyInProgress = false;
 
-                         enroll(name);
+                         enroll(name, urlAction);
                      });
                  } else {
-                     enroll(name);
+                     enroll(name, urlAction);
                  }
              });
          });
